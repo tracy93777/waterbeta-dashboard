@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WaterBeta Dashboard</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./styles.css?v=20260612-logos" />
+  </head>
+  <body class="simple-mode">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand-lockup">
+          <div class="mark">Wβ</div>
+          <div>
+            <h1>WaterBeta</h1>
+            <p>Interbrand valuation dashboard</p>
+          </div>
+        </div>
+
+        <label class="field-label" for="searchInput">Search brand</label>
+        <input id="searchInput" class="text-input" type="search" placeholder="Apple, Dior, Lambo..." />
+
+        <div class="filter-block">
+          <div class="filter-title">Selection</div>
+          <label class="check-row"><input id="adOnly" type="checkbox" /> AD selected</label>
+          <label class="check-row"><input id="modelableOnly" type="checkbox" checked /> Modelable outputs</label>
+        </div>
+
+        <label class="field-label" for="segmentFilter">Industry segment</label>
+        <select id="segmentFilter" class="select-input"></select>
+
+        <div class="advanced-only">
+          <div class="filter-block">
+            <div class="filter-title">Advanced Filters</div>
+            <label class="check-row"><input id="top100Only" type="checkbox" /> 2025 Interbrand Top 100</label>
+          </div>
+
+          <label class="field-label" for="qualityFilter">Data quality</label>
+          <select id="qualityFilter" class="select-input">
+            <option value="All">All</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+            <option value="Unknown">Unknown</option>
+          </select>
+
+          <label class="field-label" for="categoryFilter">Output category</label>
+          <select id="categoryFilter" class="select-input"></select>
+
+          <label class="field-label" for="groupFilter">Selection group</label>
+          <select id="groupFilter" class="select-input"></select>
+
+          <div class="source-box">
+            <span>Source workbook</span>
+            <strong id="sourceName">Loading...</strong>
+            <small id="generatedAt"></small>
+          </div>
+        </div>
+      </aside>
+
+      <main class="dashboard">
+        <header class="topbar">
+          <div>
+            <h2>Water-Linked Brand Value</h2>
+            <p>Executive view of water-linked brand value at risk across selected Interbrand brands.</p>
+          </div>
+          <div class="top-actions">
+            <button id="advancedToggle" class="ghost-button">Show more detail</button>
+            <button id="resetScenario" class="ghost-button">Reset scenario</button>
+            <button id="exportCsv" class="primary-button advanced-only">Export visible rows</button>
+          </div>
+        </header>
+
+        <nav class="tabs" aria-label="Dashboard views">
+          <button class="tab active" data-tab="overview">Overview</button>
+          <button class="tab" data-tab="explorer">Brand Explorer</button>
+          <button class="tab" data-tab="portfolio">Portfolio</button>
+          <button class="tab" data-tab="backtest">Back-test</button>
+          <button class="tab" data-tab="audit">Audit</button>
+        </nav>
+
+        <section class="scenario-panel">
+          <div class="scenario-title">
+            <h3>Scenario</h3>
+            <p>Change the main water-impact levers and see brand value at risk update immediately.</p>
+          </div>
+          <div class="slider-grid" id="scenarioControls"></div>
+        </section>
+
+        <section class="kpi-grid" id="kpiGrid"></section>
+
+        <section class="tab-panel active" id="overview">
+          <div class="two-column">
+            <div class="panel wide">
+              <div class="panel-head">
+                <h3>Water VaR by Industry Segment</h3>
+                <span id="sectorChartNote"></span>
+              </div>
+              <div id="sectorVarChart" class="chart-area"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Included Segment Mix</h3>
+                <span id="mixCount"></span>
+              </div>
+              <div id="segmentMixChart" class="chart-area compact"></div>
+            </div>
+          </div>
+
+          <div class="two-column lower advanced-only">
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Data Quality</h3>
+                <span>Filtered rows</span>
+              </div>
+              <div id="qualityChart" class="chart-area compact"></div>
+            </div>
+            <div class="panel wide">
+              <div class="panel-head">
+                <h3>Top Water VaR Outputs</h3>
+                <span>USD mm</span>
+              </div>
+              <div id="topVarChart" class="chart-area"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="explorer">
+          <div class="explorer-grid">
+            <div class="panel brand-picker-panel">
+              <div class="panel-head">
+                <h3>Choose a Brand</h3>
+                <span id="tableCount"></span>
+              </div>
+              <div id="brandCards" class="brand-card-list"></div>
+            </div>
+
+            <div class="panel detail-panel story-panel">
+              <div class="panel-head">
+                <h3 id="detailBrand">Selected Brand</h3>
+                <span id="detailStatus"></span>
+              </div>
+              <div id="brandStory" class="brand-story"></div>
+              <div id="impactBridge" class="impact-bridge"></div>
+              <div id="detailMetrics" class="detail-metrics story-metrics"></div>
+              <div id="historyChart" class="chart-area history advanced-only"></div>
+              <div class="note-stack">
+                <div>
+                  <strong>How to read this</strong>
+                  <p id="detailSource"></p>
+                </div>
+                <div class="advanced-only">
+                  <strong>Validation notes</strong>
+                  <p id="detailNotes"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="portfolio">
+          <div class="portfolio-grid" id="portfolioGrid"></div>
+        </section>
+
+        <section class="tab-panel" id="backtest">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Back-test Evidence</h3>
+              <span>Lower MAPE and higher R² are stronger</span>
+            </div>
+            <div id="backtestScatter" class="chart-area scatter"></div>
+          </div>
+          <div class="panel table-panel">
+            <div class="panel-head">
+              <h3>Back-test Table</h3>
+              <span id="backtestCount"></span>
+            </div>
+            <div class="table-wrap short">
+              <table id="backtestTable">
+                <thead>
+                  <tr>
+                    <th>Brand</th>
+                    <th>Points</th>
+                    <th>MAPE</th>
+                    <th>R²</th>
+                    <th>λ years used</th>
+                    <th>Category</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="audit">
+          <div class="audit-grid" id="auditGrid"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./dashboard-data.js?v=20260612-logos"></script>
+    <script src="./app.js?v=20260612-logos"></script>
+  </body>
+</html>
