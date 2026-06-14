@@ -399,7 +399,7 @@ function initScenarioControls() {
   root.innerHTML = "";
   scenarioDefs.forEach((def) => {
     const wrapper = document.createElement("div");
-    wrapper.className = `slider-control${def.simple ? "" : " advanced-only"}`;
+    wrapper.className = `slider-control${def.simple ? "" : " technical-only"}`;
     const displayValue = state.scenario[def.key] * def.scale;
     wrapper.innerHTML = `
       <div class="slider-top">
@@ -443,7 +443,7 @@ function renderKpis(rows) {
         ["Base brand value", formatCompactMoney(baseBv), "USD mm, included rows"],
         ["Water-linked BV", formatCompactMoney(waterBv), "Recalculated with scenario inputs"],
         ["Water VaR", formatCompactMoney(waterVar), `${formatPct(baseBv ? waterVar / baseBv : 0)} of base BV`],
-        ["Ready outputs", ready, "After quality and back-test screen"],
+        ["Stronger signals", ready, "Highest-confidence brand reads"],
       ];
   document.getElementById("kpiGrid").innerHTML = cards
     .map(
@@ -543,21 +543,63 @@ function renderOverview(rows) {
   const model = modelRows(rows);
   const bySector = groupBy(model, "segment", "waterVar");
   const mix = groupBy(rows, "segment");
-  const quality = groupBy(rows, "qualityTier");
-  const top = [...model].sort((a, b) => (b.waterVar || 0) - (a.waterVar || 0)).slice(0, 10);
 
   document.getElementById("sectorChartNote").textContent = `${model.length} outputs`;
   document.getElementById("mixCount").textContent = `${rows.length} visible rows`;
   renderBarList("sectorVarChart", bySector, formatCompactMoney, "teal", 10);
   renderPieChart("segmentMixChart", mix);
-  renderBarList("qualityChart", quality, (v) => `${Math.round(v)} rows`, "coral", 6);
-  renderBarList(
-    "topVarChart",
-    top.map((b) => ({ name: b.brand, value: b.waterVar || 0 })),
-    formatCompactMoney,
-    "coral",
-    10,
-  );
+  renderManagerInsights(rows, model, bySector);
+}
+
+function renderManagerInsights(rows, model, bySector) {
+  const root = document.getElementById("managerInsights");
+  if (!root) return;
+  const baseBv = sum(model, "baseBv");
+  const waterVar = sum(model, "waterVar");
+  const waterVarPct = baseBv ? waterVar / baseBv : 0;
+  const topSegment = bySector.find((item) => finite(item.value) && item.value > 0);
+  const topBrands = [...model]
+    .filter((brand) => finite(brand.waterVar) && brand.waterVar > 0)
+    .sort((a, b) => Number(b.waterVar) - Number(a.waterVar))
+    .slice(0, 3);
+  const ready = rows.filter((brand) => brand.outputCategory === "Ready to use").length;
+  const directional = rows.filter((brand) => (brand.outputCategory || "").includes("Right direction")).length;
+  const caveat = rows.filter((brand) => (brand.outputCategory || "").includes("Review") || brand.qualityTier === "Low").length;
+  const topBrandText = topBrands.length
+    ? topBrands.map((brand) => `${brand.brand} (${formatCompactMoney(brand.waterVar)})`).join(", ")
+    : "No brand-level values are available for this filter.";
+  root.innerHTML = `
+    <article class="manager-card focus">
+      <span>What changed</span>
+      <h3>${formatCompactMoney(waterVar)} brand value at risk</h3>
+      <p>This is the estimated brand value exposed under the scenario currently selected above.</p>
+    </article>
+    <article class="manager-card">
+      <span>Scale</span>
+      <h3>${formatPct(waterVarPct)} of base brand value</h3>
+      <p>Use this percentage to compare smaller and larger brands on a fairer basis.</p>
+    </article>
+    <article class="manager-card">
+      <span>Where to focus</span>
+      <h3>${topSegment ? topSegment.name : "No clear segment"}</h3>
+      <p>${topSegment ? `This segment has the largest estimated exposure: ${formatCompactMoney(topSegment.value)}.` : "The current filter does not show a clear segment concentration."}</p>
+    </article>
+    <article class="manager-card">
+      <span>Brands to discuss</span>
+      <h3>Highest estimated exposure</h3>
+      <p>${topBrands.length ? `Start the discussion with ${escapeHtml(topBrandText)}.` : escapeHtml(topBrandText)}</p>
+    </article>
+    <article class="manager-card">
+      <span>Confidence</span>
+      <h3>${ready} stronger signals</h3>
+      <p>${directional} are useful for direction. ${caveat} should be treated as early signals until stronger brand-level data is available.</p>
+    </article>
+    <article class="manager-card">
+      <span>Best use</span>
+      <h3>Choose where to ask next</h3>
+      <p>Use this view to choose the brands, sectors, and assumptions that deserve deeper follow-up.</p>
+    </article>
+  `;
 }
 
 function categoryClass(text) {
@@ -1068,7 +1110,7 @@ function wireEvents() {
   document.getElementById("advancedToggle").addEventListener("click", () => {
     state.simpleMode = !state.simpleMode;
     document.body.classList.toggle("simple-mode", state.simpleMode);
-    document.getElementById("advancedToggle").textContent = state.simpleMode ? "Show more detail" : "Simplify view";
+    document.getElementById("advancedToggle").textContent = state.simpleMode ? "Explain results" : "Hide explanation";
     if (state.simpleMode && ["portfolio", "backtest", "audit"].includes(state.tab)) {
       document.querySelector('[data-tab="overview"]').click();
     }
