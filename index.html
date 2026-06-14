@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WaterBeta Dashboard</title>
     <link rel="icon" href="data:," />
-    <link rel="stylesheet" href="./styles.css?v=20260614-clean" />
+    <link rel="stylesheet" href="./styles.css?v=20260614-manager" />
   </head>
   <body class="simple-mode">
     <div class="app-shell">
@@ -29,7 +29,7 @@
         <label class="field-label" for="segmentFilter">Industry segment</label>
         <select id="segmentFilter" class="select-input"></select>
 
-        <div class="advanced-only">
+        <div class="technical-only">
           <div class="filter-block">
             <div class="filter-title">Advanced Filters</div>
             <label class="check-row"><input id="top100Only" type="checkbox" /> 2025 Interbrand Top 100</label>
@@ -66,18 +66,18 @@
             <p>Executive view of water-linked brand value at risk across the Interbrand brand set.</p>
           </div>
           <div class="top-actions">
-            <button id="advancedToggle" class="ghost-button">Show more detail</button>
+            <button id="advancedToggle" class="ghost-button">Explain results</button>
             <button id="resetScenario" class="ghost-button">Reset scenario</button>
-            <button id="exportCsv" class="primary-button advanced-only">Export visible rows</button>
+            <button id="exportCsv" class="primary-button technical-only">Export visible rows</button>
           </div>
         </header>
 
         <nav class="tabs" aria-label="Dashboard views">
           <button class="tab active" data-tab="overview">Overview</button>
           <button class="tab" data-tab="explorer">Brand Explorer</button>
-          <button class="tab" data-tab="portfolio">Portfolio</button>
-          <button class="tab" data-tab="backtest">Back-test</button>
-          <button class="tab" data-tab="audit">Audit</button>
+          <button class="tab technical-only" data-tab="portfolio">Portfolio</button>
+          <button class="tab technical-only" data-tab="backtest">Back-test</button>
+          <button class="tab technical-only" data-tab="audit">Audit</button>
         </nav>
 
         <section class="scenario-panel">
@@ -108,22 +108,7 @@
             </div>
           </div>
 
-          <div class="two-column lower advanced-only">
-            <div class="panel">
-              <div class="panel-head">
-                <h3>Data Quality</h3>
-                <span>Filtered rows</span>
-              </div>
-              <div id="qualityChart" class="chart-area compact"></div>
-            </div>
-            <div class="panel wide">
-              <div class="panel-head">
-                <h3>Top Water VaR Outputs</h3>
-                <span>USD mm</span>
-              </div>
-              <div id="topVarChart" class="chart-area"></div>
-            </div>
-          </div>
+          <div class="manager-insights advanced-only" id="managerInsights"></div>
         </section>
 
         <section class="tab-panel" id="explorer">
@@ -144,13 +129,13 @@
               <div id="brandStory" class="brand-story"></div>
               <div id="impactBridge" class="impact-bridge"></div>
               <div id="detailMetrics" class="detail-metrics story-metrics"></div>
-              <div id="historyChart" class="chart-area history advanced-only"></div>
+              <div id="historyChart" class="chart-area history technical-only"></div>
               <div class="note-stack">
                 <div>
                   <strong>How to read this</strong>
                   <p id="detailSource"></p>
                 </div>
-                <div class="advanced-only">
+                <div class="technical-only">
                   <strong>Validation notes</strong>
                   <p id="detailNotes"></p>
                 </div>
@@ -159,11 +144,11 @@
           </div>
         </section>
 
-        <section class="tab-panel" id="portfolio">
+        <section class="tab-panel technical-only" id="portfolio">
           <div class="portfolio-grid" id="portfolioGrid"></div>
         </section>
 
-        <section class="tab-panel" id="backtest">
+        <section class="tab-panel technical-only" id="backtest">
           <div class="panel">
             <div class="panel-head">
               <h3>Back-test Evidence</h3>
@@ -194,13 +179,13 @@
           </div>
         </section>
 
-        <section class="tab-panel" id="audit">
+        <section class="tab-panel technical-only" id="audit">
           <div class="audit-grid" id="auditGrid"></div>
         </section>
       </main>
     </div>
 
-    <script src="./dashboard-data.js?v=20260614-clean"></script>
-    <script src="./app.js?v=20260614-clean"></script>
+    <script src="./dashboard-data.js?v=20260614-manager"></script>
+    <script src="./app.js?v=20260614-manager"></script>
   </body>
 </html>
