@@ -433,14 +433,14 @@ function renderKpis(rows) {
   const ready = rows.filter((b) => b.outputCategory === "Ready to use").length;
   const cards = state.simpleMode
     ? [
-        ["Water VaR", formatCompactMoney(waterVar), `${formatPct(baseBv ? waterVar / baseBv : 0)} of selected base BV`],
+        ["Water VaR", formatCompactMoney(waterVar), `${formatPct(baseBv ? waterVar / baseBv : 0)} of base BV`],
         ["Water-linked BV", formatCompactMoney(waterBv), "Scenario-adjusted brand value"],
-        ["Base brand value", formatCompactMoney(baseBv), "Selected modelable rows"],
-        ["Outputs shown", rows.length, `${model.length} modelable`],
+        ["Base brand value", formatCompactMoney(baseBv), "Included brand set"],
+        ["Outputs shown", rows.length, `${model.length} outputs`],
       ]
     : [
-        ["Visible rows", rows.length, `${model.length} modelable`],
-        ["Base brand value", formatCompactMoney(baseBv), "USD mm, filtered modelable rows"],
+        ["Visible rows", rows.length, `${model.length} outputs`],
+        ["Base brand value", formatCompactMoney(baseBv), "USD mm, included rows"],
         ["Water-linked BV", formatCompactMoney(waterBv), "Recalculated with scenario inputs"],
         ["Water VaR", formatCompactMoney(waterVar), `${formatPct(baseBv ? waterVar / baseBv : 0)} of base BV`],
         ["Ready outputs", ready, "After quality and back-test screen"],
@@ -546,7 +546,7 @@ function renderOverview(rows) {
   const quality = groupBy(rows, "qualityTier");
   const top = [...model].sort((a, b) => (b.waterVar || 0) - (a.waterVar || 0)).slice(0, 10);
 
-  document.getElementById("sectorChartNote").textContent = `${model.length} modelable outputs`;
+  document.getElementById("sectorChartNote").textContent = `${model.length} outputs`;
   document.getElementById("mixCount").textContent = `${rows.length} visible rows`;
   renderBarList("sectorVarChart", bySector, formatCompactMoney, "teal", 10);
   renderPieChart("segmentMixChart", mix);
@@ -671,7 +671,7 @@ function renderDetail(rows) {
   const visible = rows.length ? sortedRows(rows) : sortedRows(enrichedBrands());
   const selected = visible.find((b) => b.id === state.selectedId) || visible[0];
   if (!selected) {
-    document.getElementById("detailBrand").textContent = "Selected Brand";
+    document.getElementById("detailBrand").textContent = "Brand Detail";
     document.getElementById("detailMetrics").innerHTML = "";
     return;
   }
@@ -910,7 +910,7 @@ function renderAudit(rows) {
     {
       title: "λ_EBIT Guardrail",
       body: [
-        `${floored} visible modelable rows have negative raw λ_EBIT and are floored at zero in Scenario λ_EBIT.`,
+        `${floored} visible rows have negative raw λ_EBIT and are floored at zero in Scenario λ_EBIT.`,
         "This prevents a water-related earnings decline from mechanically increasing brand value.",
       ],
     },
@@ -967,7 +967,6 @@ function exportVisibleCsv() {
     "Brand",
     "Parent",
     "Segment",
-    "Selected by AD",
     "Base BV Year",
     "Base BV USD mm",
     "Water BV USD mm",
@@ -986,7 +985,6 @@ function exportVisibleCsv() {
       b.brand,
       b.parent,
       b.segment,
-      b.selectedByAD,
       b.baseBvYear,
       b.baseBv,
       b.waterBv,
