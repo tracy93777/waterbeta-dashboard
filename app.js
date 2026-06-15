@@ -426,37 +426,67 @@ function formatSlider(value, unit) {
   return `${Math.round(value)} ${unit}`;
 }
 
+function confidenceCounts(rows) {
+  const counts = { high: 0, medium: 0, low: 0 };
+  modelRows(rows).forEach((brand) => {
+    const quality = brand.qualityTier || "Low";
+    if (quality === "High") counts.high += 1;
+    else if (quality === "Medium") counts.medium += 1;
+    else counts.low += 1;
+  });
+  return counts;
+}
+
+function confidenceMixMarkup(counts) {
+  return `
+    <div class="confidence-mix" aria-label="Confidence mix">
+      <span class="confidence-pill high">High <strong>${counts.high}</strong></span>
+      <span class="confidence-pill medium">Medium <strong>${counts.medium}</strong></span>
+      <span class="confidence-pill low">Low <strong>${counts.low}</strong></span>
+    </div>
+  `;
+}
+
 function renderKpis(rows) {
   const model = modelRows(rows);
   const baseBv = sum(model, "baseBv");
   const waterBv = sum(model, "waterBv");
   const waterVar = sum(model, "waterVar");
-  const ready = rows.filter((b) => b.outputCategory === "Ready to use").length;
+  const confidence = confidenceCounts(rows);
   const cards = state.simpleMode
     ? [
-        ["Water VaR", formatCompactMoney(waterVar), `${formatPct(baseBv ? waterVar / baseBv : 0)} of base BV`],
-        ["Water-linked BV", formatCompactMoney(waterBv), "Scenario-adjusted brand value"],
-        ["Base brand value", formatCompactMoney(baseBv), "Included brand set"],
-        ["Outputs shown", rows.length, `${model.length} outputs`],
+        { label: "Water VaR", value: formatCompactMoney(waterVar), note: `${formatPct(baseBv ? waterVar / baseBv : 0)} of base BV` },
+        { label: "Water-linked BV", value: formatCompactMoney(waterBv), note: "Scenario-adjusted brand value" },
+        { label: "Base brand value", value: formatCompactMoney(baseBv), note: "Included brand set" },
+        { label: "Confidence mix", valueHtml: confidenceMixMarkup(confidence), note: "High / Medium / Low brand reads" },
       ]
     : [
-        ["Visible rows", rows.length, `${model.length} outputs`],
-        ["Base brand value", formatCompactMoney(baseBv), "USD mm, included rows"],
-        ["Water-linked BV", formatCompactMoney(waterBv), "Recalculated with scenario inputs"],
-        ["Water VaR", formatCompactMoney(waterVar), `${formatPct(baseBv ? waterVar / baseBv : 0)} of base BV`],
-        ["Stronger signals", ready, "Highest-confidence brand reads"],
+        { label: "Water VaR", value: formatCompactMoney(waterVar), note: `${formatPct(baseBv ? waterVar / baseBv : 0)} of base BV` },
+        { label: "Water-linked BV", value: formatCompactMoney(waterBv), note: "Scenario-adjusted brand value" },
+        { label: "Base brand value", value: formatCompactMoney(baseBv), note: "Included brand set" },
+        { label: "Confidence mix", valueHtml: confidenceMixMarkup(confidence), note: "High / Medium / Low brand reads" },
       ];
   document.getElementById("kpiGrid").innerHTML = cards
     .map(
-      ([label, value, note]) => `
+      ({ label, value, valueHtml, note }) => `
         <div class="kpi-card">
           <span>${label}</span>
-          <strong>${value}</strong>
+          ${valueHtml || `<strong>${value}</strong>`}
           <small>${note}</small>
         </div>
       `,
     )
     .join("");
+  renderConfidenceFootnotes(model.length);
+}
+
+function renderConfidenceFootnotes(outputCount) {
+  const root = document.getElementById("confidenceFootnotes");
+  if (!root) return;
+  root.innerHTML = `
+    <p><strong>Confidence footnote:</strong> counts reflect ${outputCount} modeled brand reads currently in view.</p>
+    <p><strong>High</strong> = strongest public data and model support. <strong>Medium</strong> = useful directional read with caveats. <strong>Low</strong> = early signal; do not cite as standalone proof.</p>
+  `;
 }
 
 function renderBarList(containerId, data, formatter, accent = "teal", limit = 12) {
@@ -512,7 +542,7 @@ function renderPieChart(containerId, data) {
       const start = cursor;
       const end = cursor + (row.value / total) * 360;
       cursor = end;
-      return `<path d="${pieSlicePath(102, 102, 86, start, end)}" fill="${palette[index % palette.length]}" stroke="#fff" stroke-width="2"><title>${row.name}: ${Math.round(row.value)} rows</title></path>`;
+      return `<path d="${pieSlicePath(102, 102, 86, start, end)}" fill="${palette[index % palette.length]}" stroke="#fff" stroke-width="2"><title>${row.name}: ${Math.round(row.value)} brands</title></path>`;
     })
     .join("");
   root.innerHTML = `
@@ -521,7 +551,7 @@ function renderPieChart(containerId, data) {
         ${slices}
         <circle cx="102" cy="102" r="46" fill="#fff" stroke="#e2e8e3" stroke-width="1"></circle>
         <text x="102" y="96" text-anchor="middle" class="pie-total">${Math.round(total)}</text>
-        <text x="102" y="116" text-anchor="middle" class="pie-caption">visible rows</text>
+        <text x="102" y="116" text-anchor="middle" class="pie-caption">brands</text>
       </svg>
       <div class="pie-legend">
         ${rows
@@ -545,8 +575,8 @@ function renderOverview(rows) {
   const bySector = groupBy(model, "segment", "waterVar");
   const mix = groupBy(rows, "segment");
 
-  document.getElementById("sectorChartNote").textContent = `${model.length} outputs`;
-  document.getElementById("mixCount").textContent = `${rows.length} visible rows`;
+  document.getElementById("sectorChartNote").textContent = `${model.length} brand reads`;
+  document.getElementById("mixCount").textContent = `${rows.length} brands`;
   renderBarList("sectorVarChart", bySector, formatCompactMoney, "teal", 10);
   renderPieChart("segmentMixChart", mix);
   renderManagerInsights(rows, model, bySector);
@@ -563,9 +593,7 @@ function renderManagerInsights(rows, model, bySector) {
     .filter((brand) => finite(brand.waterVar) && brand.waterVar > 0)
     .sort((a, b) => Number(b.waterVar) - Number(a.waterVar))
     .slice(0, 3);
-  const ready = rows.filter((brand) => brand.outputCategory === "Ready to use").length;
-  const directional = rows.filter((brand) => (brand.outputCategory || "").includes("Right direction")).length;
-  const caveat = rows.filter((brand) => (brand.outputCategory || "").includes("Review") || brand.qualityTier === "Low").length;
+  const confidence = confidenceCounts(rows);
   const topBrandText = topBrands.length
     ? topBrands.map((brand) => `${brand.brand} (${formatCompactMoney(brand.waterVar)})`).join(", ")
     : "No brand-level values are available for this filter.";
@@ -592,8 +620,8 @@ function renderManagerInsights(rows, model, bySector) {
     </article>
     <article class="manager-card">
       <span>Confidence</span>
-      <h3>${ready} stronger signals</h3>
-      <p>${directional} are useful for direction. ${caveat} should be treated as early signals until stronger brand-level data is available.</p>
+      <h3>High ${confidence.high} / Medium ${confidence.medium} / Low ${confidence.low}</h3>
+      <p>Use High as the cleanest group to cite. Medium and Low need caveats before a formal brand conversation.</p>
     </article>
     <article class="manager-card">
       <span>Best use</span>
