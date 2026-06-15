@@ -348,6 +348,13 @@ select {
   accent-color: var(--teal);
 }
 
+.slider-help {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(150px, 1fr));
