@@ -213,11 +213,11 @@ select {
 }
 
 .simple-mode .chart-area.compact {
-  min-height: 250px;
+  min-height: 330px;
 }
 
 .simple-mode .pie-layout {
-  min-height: 250px;
+  min-height: 330px;
 }
 
 .topbar {
@@ -460,7 +460,7 @@ select {
 
 .two-column {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+  grid-template-columns: minmax(0, 1fr) minmax(470px, 0.95fr);
   gap: 16px;
 }
 
@@ -1039,15 +1039,15 @@ tbody tr.selected {
 
 .pie-layout {
   display: grid;
-  grid-template-columns: minmax(170px, 220px) 1fr;
-  gap: 14px;
+  grid-template-columns: minmax(220px, 280px) minmax(130px, 1fr);
+  gap: 18px;
   align-items: center;
-  min-height: 250px;
+  min-height: 320px;
 }
 
 .pie-svg {
   width: 100%;
-  max-width: 220px;
+  max-width: 280px;
   justify-self: center;
 }
 
