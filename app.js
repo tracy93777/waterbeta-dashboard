@@ -18,9 +18,9 @@ const state = {
 };
 
 const scenarioDefs = [
-  { key: "directEbitShock", label: "EBIT impact", min: 0, max: 30, step: 0.5, unit: "%", scale: 100, simple: true },
-  { key: "discountUpliftBps", label: "Discount uplift", min: 0, max: 250, step: 5, unit: "bps", scale: 1, simple: true, helper: "Extra risk premium applied to brand value." },
-  { key: "rbiShock", label: "Perception shock", min: 0, max: 30, step: 0.5, unit: "%", scale: 100, simple: true, helper: "Immediate brand trust or demand hit." },
+  { key: "directEbitShock", label: "Thirst earnings hit", min: 0, max: 30, step: 0.5, unit: "%", scale: 100, simple: true, helper: "waterBeta® earnings-at-risk pressure." },
+  { key: "discountUpliftBps", label: "WACC uplift", min: 0, max: 250, step: 5, unit: "bps", scale: 1, simple: true, helper: "Capital-market risk premium applied to brand value." },
+  { key: "rbiShock", label: "Trust shock", min: 0, max: 30, step: 0.5, unit: "%", scale: 100, simple: true, helper: "GBRI™ pressure on brand trust and demand." },
   { key: "revenueShock", label: "Revenue shock", min: -20, max: 20, step: 0.5, unit: "%", scale: 100, simple: false },
   { key: "assetPenalty", label: "fAR / asset penalty", min: 0, max: 20, step: 0.5, unit: "%", scale: 100, simple: false },
   { key: "baseDiscountRate", label: "Base discount rate", min: 0, max: 15, step: 0.25, unit: "%", scale: 100, simple: false },
@@ -455,16 +455,16 @@ function renderKpis(rows) {
   const confidence = confidenceCounts(rows);
   const cards = state.simpleMode
     ? [
-        { label: "Water VaR", value: formatCompactMoney(waterVar), note: `${formatPct(baseBv ? waterVar / baseBv : 0)} of base BV` },
-        { label: "Water-linked BV", value: formatCompactMoney(waterBv), note: "Scenario-adjusted brand value" },
+        { label: "waterVaR™", value: formatCompactMoney(waterVar), note: `${formatPct(baseBv ? waterVar / baseBv : 0)} of base brand value` },
+        { label: "Water-linked brand value", value: formatCompactMoney(waterBv), note: "brandAlpha™ scenario view" },
         { label: "Base brand value", value: formatCompactMoney(baseBv), note: "Included brand set" },
-        { label: "Confidence mix", valueHtml: confidenceMixMarkup(confidence), note: "High / Medium / Low brand reads" },
+        { label: "Signal confidence", valueHtml: confidenceMixMarkup(confidence), note: "High / Medium / Low brand reads" },
       ]
     : [
-        { label: "Water VaR", value: formatCompactMoney(waterVar), note: `${formatPct(baseBv ? waterVar / baseBv : 0)} of base BV` },
-        { label: "Water-linked BV", value: formatCompactMoney(waterBv), note: "Scenario-adjusted brand value" },
+        { label: "waterVaR™", value: formatCompactMoney(waterVar), note: `${formatPct(baseBv ? waterVar / baseBv : 0)} of base brand value` },
+        { label: "Water-linked brand value", value: formatCompactMoney(waterBv), note: "brandAlpha™ scenario view" },
         { label: "Base brand value", value: formatCompactMoney(baseBv), note: "Included brand set" },
-        { label: "Confidence mix", valueHtml: confidenceMixMarkup(confidence), note: "High / Medium / Low brand reads" },
+        { label: "Signal confidence", valueHtml: confidenceMixMarkup(confidence), note: "High / Medium / Low brand reads" },
       ];
   document.getElementById("kpiGrid").innerHTML = cards
     .map(
@@ -484,7 +484,7 @@ function renderConfidenceFootnotes(outputCount) {
   const root = document.getElementById("confidenceFootnotes");
   if (!root) return;
   root.innerHTML = `
-    <p><strong>Confidence footnote:</strong> counts reflect ${outputCount} modeled brand reads currently in view.</p>
+    <p><strong>Signal confidence:</strong> counts reflect ${outputCount} modeled brand reads currently in view.</p>
     <p><strong>High</strong> = strongest public data and model support. <strong>Medium</strong> = useful directional read with caveats. <strong>Low</strong> = early signal; do not cite as standalone proof.</p>
   `;
 }
@@ -599,12 +599,12 @@ function renderManagerInsights(rows, model, bySector) {
     : "No brand-level values are available for this filter.";
   root.innerHTML = `
     <article class="manager-card focus">
-      <span>What changed</span>
-      <h3>${formatCompactMoney(waterVar)} brand value at risk</h3>
-      <p>This is the estimated brand value exposed under the scenario currently selected above.</p>
+      <span>brandAlpha™ impact</span>
+      <h3>${formatCompactMoney(waterVar)} waterVaR™</h3>
+      <p>This is the estimated water-linked brand value exposure under the current Thirst + Trust scenario.</p>
     </article>
     <article class="manager-card">
-      <span>Scale</span>
+      <span>Relative scale</span>
       <h3>${formatPct(waterVarPct)} of base brand value</h3>
       <p>Use this percentage to compare smaller and larger brands on a fairer basis.</p>
     </article>
@@ -614,19 +614,19 @@ function renderManagerInsights(rows, model, bySector) {
       <p>${topSegment ? `This segment has the largest estimated exposure: ${formatCompactMoney(topSegment.value)}.` : "The current filter does not show a clear segment concentration."}</p>
     </article>
     <article class="manager-card">
-      <span>Brands to discuss</span>
+      <span>Brand conversation starters</span>
       <h3>Highest estimated exposure</h3>
       <p>${topBrands.length ? `Start the discussion with ${escapeHtml(topBrandText)}.` : escapeHtml(topBrandText)}</p>
     </article>
     <article class="manager-card">
-      <span>Confidence</span>
+      <span>Signal confidence</span>
       <h3>High ${confidence.high} / Medium ${confidence.medium} / Low ${confidence.low}</h3>
       <p>Use High as the cleanest group to cite. Medium and Low need caveats before a formal brand conversation.</p>
     </article>
     <article class="manager-card">
       <span>Best use</span>
       <h3>Choose where to ask next</h3>
-      <p>Use this view to choose the brands, sectors, and assumptions that deserve deeper follow-up.</p>
+      <p>Use this view to choose the brands, sectors, and waterBeta® assumptions that deserve deeper follow-up.</p>
     </article>
   `;
 }
@@ -742,7 +742,7 @@ function renderDetail(rows) {
   const visible = rows.length ? sortedRows(rows) : sortedRows(enrichedBrands());
   const selected = visible.find((b) => b.id === state.selectedId) || visible[0];
   if (!selected) {
-    document.getElementById("detailBrand").textContent = "Brand Detail";
+    document.getElementById("detailBrand").textContent = "Brand Read";
     document.getElementById("detailMetrics").innerHTML = "";
     return;
   }
@@ -764,11 +764,11 @@ function renderDetail(rows) {
   wireLogoFallbacks(document.getElementById("detailBrand"));
   renderImpactBridge(selected);
   const tiles = [
-    ["Impact size", selected.modelable ? formatRoundedImpact(selected.waterVar) : "Needs data"],
-    ["Share of BV", selected.modelable ? formatPct(selected.waterVarPct) : "n/a"],
-    ["Base BV year", selected.baseBvYear || "n/a"],
-    ["Sensitivity to EBIT", sensitivity],
-    ["Evidence strength", selected.qualityTier || "Unknown"],
+    ["waterVaR™", selected.modelable ? formatRoundedImpact(selected.waterVar) : "Needs data"],
+    ["Share of base brand value", selected.modelable ? formatPct(selected.waterVarPct) : "n/a"],
+    ["Base brand value year", selected.baseBvYear || "n/a"],
+    ["λ_EBIT sensitivity", sensitivity],
+    ["Signal confidence", selected.qualityTier || "Unknown"],
     ["Scope", selected.type === "Portfolio" ? "Portfolio" : selected.financialScopeMatch || "Standalone / proxy"],
   ];
   document.getElementById("detailMetrics").innerHTML = tiles
@@ -809,12 +809,12 @@ function renderImpactBridge(brand) {
       <strong>${formatCompactMoney(brand.baseBv)}</strong>
     </div>
     <div class="impact-row">
-      <span>Water-linked value</span>
+      <span>Water-linked brand value</span>
       <div class="impact-track"><div class="impact-fill water" style="width:${waterWidth}%"></div></div>
       <strong>${formatCompactMoney(brand.waterBv)}</strong>
     </div>
     <div class="impact-row">
-      <span>Value at risk</span>
+      <span>waterVaR™</span>
       <div class="impact-track"><div class="impact-fill risk" style="width:${varWidth}%"></div></div>
       <strong>${formatCompactMoney(brand.waterVar)}</strong>
     </div>
@@ -881,8 +881,8 @@ function renderPortfolio(rows) {
             <span class="badge ${qualityClass(p.qualityTier)}">${p.dataQuality}</span>
           </div>
           <div class="portfolio-metrics">
-            <div class="metric-tile"><span>Base BV</span><strong>${formatMoney(p.baseBv)}</strong></div>
-            <div class="metric-tile"><span>Water VaR</span><strong>${formatMoney(p.waterVar)}</strong></div>
+            <div class="metric-tile"><span>Base brand value</span><strong>${formatMoney(p.baseBv)}</strong></div>
+            <div class="metric-tile"><span>waterVaR™</span><strong>${formatMoney(p.waterVar)}</strong></div>
             <div class="metric-tile"><span>VaR %</span><strong>${formatPct(p.waterVarPct)}</strong></div>
           </div>
           <p>${p.sourceBasis}</p>
@@ -958,8 +958,8 @@ function renderAudit(rows) {
     {
       title: "Formula",
       body: [
-        "Water BV = Base BV × (Water NOPAT ÷ Base NOPAT)^λ × Discount factor × RBI factor.",
-        "Water VaR = Base BV − Water BV.",
+        "Water-linked brand value = Base BV × (Water NOPAT ÷ Base NOPAT)^λ × Discount factor × RBI factor.",
+        "waterVaR™ = Base BV − Water-linked brand value.",
         "λ_EBIT = SLOPE(LN(Brand Value), LN(EBIT)) using positive historical pairs.",
       ],
     },
@@ -1041,8 +1041,8 @@ function exportVisibleCsv() {
     "Base BV Year",
     "Base BV USD mm",
     "Water BV USD mm",
-    "Water VaR USD mm",
-    "Water VaR %",
+    "waterVaR USD mm",
+    "waterVaR %",
     "Scenario lambda EBIT",
     "R squared",
     "MAPE",
