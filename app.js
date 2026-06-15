@@ -19,8 +19,8 @@ const state = {
 
 const scenarioDefs = [
   { key: "directEbitShock", label: "EBIT impact", min: 0, max: 30, step: 0.5, unit: "%", scale: 100, simple: true },
-  { key: "discountUpliftBps", label: "Discount uplift", min: 0, max: 250, step: 5, unit: "bps", scale: 1, simple: true },
-  { key: "rbiShock", label: "Perception shock", min: 0, max: 30, step: 0.5, unit: "%", scale: 100, simple: true },
+  { key: "discountUpliftBps", label: "Discount uplift", min: 0, max: 250, step: 5, unit: "bps", scale: 1, simple: true, helper: "Extra risk premium applied to brand value." },
+  { key: "rbiShock", label: "Perception shock", min: 0, max: 30, step: 0.5, unit: "%", scale: 100, simple: true, helper: "Immediate brand trust or demand hit." },
   { key: "revenueShock", label: "Revenue shock", min: -20, max: 20, step: 0.5, unit: "%", scale: 100, simple: false },
   { key: "assetPenalty", label: "fAR / asset penalty", min: 0, max: 20, step: 0.5, unit: "%", scale: 100, simple: false },
   { key: "baseDiscountRate", label: "Base discount rate", min: 0, max: 15, step: 0.25, unit: "%", scale: 100, simple: false },
@@ -407,6 +407,7 @@ function initScenarioControls() {
         <span id="${def.key}Value">${formatSlider(displayValue, def.unit)}</span>
       </div>
       <input id="${def.key}" type="range" min="${def.min}" max="${def.max}" step="${def.step}" value="${displayValue}" />
+      ${def.helper ? `<p class="slider-help">${def.helper}</p>` : ""}
     `;
     root.appendChild(wrapper);
     wrapper.querySelector("input").addEventListener("input", (event) => {
