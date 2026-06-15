@@ -1144,6 +1144,11 @@ function wireEvents() {
       document.querySelector('[data-tab="overview"]').click();
     }
     render();
+    if (!state.simpleMode) {
+      requestAnimationFrame(() => {
+        document.getElementById("managerInsights")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    }
   });
 }
 
