@@ -455,16 +455,16 @@ function renderKpis(rows) {
   const confidence = confidenceCounts(rows);
   const cards = state.simpleMode
     ? [
-        { label: "Water impact on brand value", value: formatCompactMoney(waterVar), note: `${formatPct(baseBv ? waterVar / baseBv : 0)} of base brand value` },
-        { label: "Brand value after water impact", value: formatCompactMoney(waterBv), note: "Scenario-adjusted estimate" },
-        { label: "Base brand value", value: formatCompactMoney(baseBv), note: "Included brand set" },
-        { label: "Signal confidence", valueHtml: confidenceMixMarkup(confidence), note: "High / Medium / Low brand reads" },
+        { label: "Estimated water impact", value: formatCompactMoney(waterVar), note: `${formatPct(baseBv ? waterVar / baseBv : 0)} of starting brand value` },
+        { label: "Brand value after water impact", value: formatCompactMoney(waterBv), note: "Starting value minus estimated impact" },
+        { label: "Starting brand value", value: formatCompactMoney(baseBv), note: "Sum of analyzed brands" },
+        { label: "Evidence quality", valueHtml: confidenceMixMarkup(confidence), note: "Analyzed brands by support level" },
       ]
     : [
-        { label: "Water impact on brand value", value: formatCompactMoney(waterVar), note: `${formatPct(baseBv ? waterVar / baseBv : 0)} of base brand value` },
-        { label: "Brand value after water impact", value: formatCompactMoney(waterBv), note: "Scenario-adjusted estimate" },
-        { label: "Base brand value", value: formatCompactMoney(baseBv), note: "Included brand set" },
-        { label: "Signal confidence", valueHtml: confidenceMixMarkup(confidence), note: "High / Medium / Low brand reads" },
+        { label: "Estimated water impact", value: formatCompactMoney(waterVar), note: `${formatPct(baseBv ? waterVar / baseBv : 0)} of starting brand value` },
+        { label: "Brand value after water impact", value: formatCompactMoney(waterBv), note: "Starting value minus estimated impact" },
+        { label: "Starting brand value", value: formatCompactMoney(baseBv), note: "Sum of analyzed brands" },
+        { label: "Evidence quality", valueHtml: confidenceMixMarkup(confidence), note: "Analyzed brands by support level" },
       ];
   document.getElementById("kpiGrid").innerHTML = cards
     .map(
@@ -484,8 +484,8 @@ function renderConfidenceFootnotes(outputCount) {
   const root = document.getElementById("confidenceFootnotes");
   if (!root) return;
   root.innerHTML = `
-    <p><strong>Signal confidence:</strong> counts reflect ${outputCount} modeled brand reads currently in view.</p>
-    <p><strong>High</strong> = strongest public data and model support. <strong>Medium</strong> = useful directional read with caveats. <strong>Low</strong> = early signal; do not cite as standalone proof.</p>
+    <p><strong>Evidence quality:</strong> counts show how many analyzed brands have High, Medium, or Low support in the current view.</p>
+    <p><strong>High</strong> = strongest public data and model support. <strong>Medium</strong> = useful directionally, with caveats. <strong>Low</strong> = early signal; do not cite alone.</p>
   `;
 }
 
@@ -575,7 +575,7 @@ function renderOverview(rows) {
   const bySector = groupBy(model, "segment", "waterVar");
   const mix = groupBy(rows, "segment");
 
-  document.getElementById("sectorChartNote").textContent = `${model.length} brand reads`;
+  document.getElementById("sectorChartNote").textContent = `${model.length} analyzed brands`;
   document.getElementById("mixCount").textContent = `${rows.length} brands`;
   renderBarList("sectorVarChart", bySector, formatCompactMoney, "teal", 10);
   renderPieChart("segmentMixChart", mix);
@@ -605,7 +605,7 @@ function renderManagerInsights(rows, model, bySector) {
     </article>
     <article class="manager-card">
       <span>Relative scale</span>
-      <h3>${formatPct(waterVarPct)} of base brand value</h3>
+      <h3>${formatPct(waterVarPct)} of starting brand value</h3>
       <p>Use this percentage to compare smaller and larger brands on a fairer basis.</p>
     </article>
     <article class="manager-card">
@@ -619,7 +619,7 @@ function renderManagerInsights(rows, model, bySector) {
       <p>${topBrands.length ? `Start the discussion with ${escapeHtml(topBrandText)}.` : escapeHtml(topBrandText)}</p>
     </article>
     <article class="manager-card">
-      <span>Signal confidence</span>
+      <span>Evidence quality</span>
       <h3>High ${confidence.high} / Medium ${confidence.medium} / Low ${confidence.low}</h3>
       <p>Use High as the cleanest group to cite. Medium and Low need caveats before a formal brand conversation.</p>
     </article>
@@ -754,7 +754,7 @@ function renderDetail(rows) {
   document.getElementById("detailStatus").innerHTML = `<span class="badge ${risk.className}">${risk.label}</span>`;
   document.getElementById("brandStory").innerHTML = selected.modelable
     ? `
-      <p class="story-lead">Under this scenario, <strong>${escapeHtml(selected.brand)}</strong> shows ${risk.label.toLowerCase()}: <strong>${formatRoundedImpact(selected.waterVar)}</strong>, or <strong>${formatPct(selected.waterVarPct)}</strong> of its base brand value.</p>
+      <p class="story-lead">Under this scenario, <strong>${escapeHtml(selected.brand)}</strong> shows ${risk.label.toLowerCase()}: <strong>${formatRoundedImpact(selected.waterVar)}</strong>, or <strong>${formatPct(selected.waterVarPct)}</strong> of its starting brand value.</p>
       <p>${confidenceSentence(selected)} ${useSentence(selected)}</p>
     `
     : `
@@ -764,11 +764,11 @@ function renderDetail(rows) {
   wireLogoFallbacks(document.getElementById("detailBrand"));
   renderImpactBridge(selected);
   const tiles = [
-    ["Water impact on brand value", selected.modelable ? formatRoundedImpact(selected.waterVar) : "Needs data"],
-    ["Share of base brand value", selected.modelable ? formatPct(selected.waterVarPct) : "n/a"],
-    ["Base brand value year", selected.baseBvYear || "n/a"],
-    ["λ_EBIT sensitivity", sensitivity],
-    ["Signal confidence", selected.qualityTier || "Unknown"],
+    ["Estimated water impact", selected.modelable ? formatRoundedImpact(selected.waterVar) : "Needs data"],
+    ["Share of starting brand value", selected.modelable ? formatPct(selected.waterVarPct) : "n/a"],
+    ["Starting brand value year", selected.baseBvYear || "n/a"],
+    ["Brand value sensitivity", sensitivity],
+    ["Evidence quality", selected.qualityTier || "Unknown"],
     ["Scope", selected.type === "Portfolio" ? "Portfolio" : selected.financialScopeMatch || "Standalone / proxy"],
   ];
   document.getElementById("detailMetrics").innerHTML = tiles
@@ -804,7 +804,7 @@ function renderImpactBridge(brand) {
   const varWidth = Math.max(1, Math.min(100, (brand.waterVar / base) * 100));
   root.innerHTML = `
     <div class="impact-row">
-      <span>Base brand value</span>
+      <span>Starting brand value</span>
       <div class="impact-track"><div class="impact-fill base" style="width:100%"></div></div>
       <strong>${formatCompactMoney(brand.baseBv)}</strong>
     </div>
@@ -814,7 +814,7 @@ function renderImpactBridge(brand) {
       <strong>${formatCompactMoney(brand.waterBv)}</strong>
     </div>
     <div class="impact-row">
-      <span>Water impact on brand value</span>
+      <span>Estimated water impact</span>
       <div class="impact-track"><div class="impact-fill risk" style="width:${varWidth}%"></div></div>
       <strong>${formatCompactMoney(brand.waterVar)}</strong>
     </div>
@@ -881,9 +881,9 @@ function renderPortfolio(rows) {
             <span class="badge ${qualityClass(p.qualityTier)}">${p.dataQuality}</span>
           </div>
           <div class="portfolio-metrics">
-            <div class="metric-tile"><span>Base brand value</span><strong>${formatMoney(p.baseBv)}</strong></div>
-            <div class="metric-tile"><span>Water impact</span><strong>${formatMoney(p.waterVar)}</strong></div>
-            <div class="metric-tile"><span>Impact %</span><strong>${formatPct(p.waterVarPct)}</strong></div>
+            <div class="metric-tile"><span>Starting brand value</span><strong>${formatMoney(p.baseBv)}</strong></div>
+            <div class="metric-tile"><span>Estimated water impact</span><strong>${formatMoney(p.waterVar)}</strong></div>
+            <div class="metric-tile"><span>Impact as %</span><strong>${formatPct(p.waterVarPct)}</strong></div>
           </div>
           <p>${p.sourceBasis}</p>
           <strong>Included Interbrand-valued brands</strong>
@@ -958,15 +958,15 @@ function renderAudit(rows) {
     {
       title: "Formula",
       body: [
-        "Brand value after water impact = Base BV × (Water NOPAT ÷ Base NOPAT)^λ × Discount factor × brand trust factor.",
-        "Water impact on brand value = Base BV − Brand value after water impact.",
+        "Brand value after water impact = Starting brand value × (Water NOPAT ÷ Base NOPAT)^λ × Discount factor × brand trust factor.",
+        "Estimated water impact = Starting brand value − Brand value after water impact.",
         "λ_EBIT = SLOPE(LN(Brand Value), LN(EBIT)) using positive historical pairs.",
       ],
     },
     {
       title: "Currency Treatment",
       body: [
-        "Base brand value remains USD mm.",
+        "Starting brand value remains USD mm.",
         "Revenue, EBIT, and NOPAT remain in native currency because the NOPAT ratio cancels the currency unit.",
         "FX rate is kept as a display and sanity-check field, not multiplied inside λ or NOPAT ratio math.",
       ],
@@ -1038,11 +1038,11 @@ function exportVisibleCsv() {
     "Brand",
     "Parent",
     "Segment",
-    "Base BV Year",
-    "Base BV USD mm",
+    "Starting Brand Value Year",
+    "Starting Brand Value USD mm",
     "Brand Value After Water Impact USD mm",
-    "Water Impact on Brand Value USD mm",
-    "Water Impact on Brand Value %",
+    "Estimated Water Impact USD mm",
+    "Estimated Water Impact %",
     "Scenario lambda EBIT",
     "R squared",
     "MAPE",
