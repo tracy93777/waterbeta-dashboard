@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Water Impact Dashboard | EquariusAI</title>
+    <title>The Water Value in Your Brand | EquariusAI</title>
     <link rel="icon" href="data:," />
-    <link rel="stylesheet" href="./styles.css?v=20260616-plain-copy" />
+    <link rel="stylesheet" href="./styles.css?v=20260619-clean-banner" />
   </head>
   <body class="simple-mode">
     <div class="app-shell">
@@ -13,7 +13,7 @@
         <div class="brand-lockup">
           <div class="mark">WI</div>
           <div>
-            <h1>Water Impact</h1>
+            <h1>Water Value</h1>
             <p>Brand value dashboard</p>
           </div>
         </div>
@@ -23,7 +23,7 @@
 
         <div class="public-defaults" hidden>
           <input id="adOnly" type="checkbox" />
-          <input id="modelableOnly" type="checkbox" checked />
+          <input id="modelableOnly" type="checkbox" />
         </div>
 
         <label class="field-label" for="segmentFilter">Industry segment</label>
@@ -62,8 +62,8 @@
       <main class="dashboard">
         <header class="topbar">
           <div>
-            <h2>Water Impact on Brand Value</h2>
-            <p>Explore how water impact can affect earnings, financing costs, brand trust, and brand value.</p>
+            <h2>The Water Value in Your Brand</h2>
+            <p>Explore how water strategy can unlock earnings resilience, brand trust, and future brand value.</p>
           </div>
           <div class="top-actions">
             <button id="advancedToggle" class="ghost-button">Explain results</button>
@@ -83,11 +83,12 @@
         <section class="scenario-panel">
           <div class="scenario-title">
             <h3>Scenario Levers</h3>
-            <p>Adjust earnings pressure, cost of debt, and brand trust impact; the brand value estimate updates immediately.</p>
+            <p>Adjust earnings pressure, financing pressure, and brand trust; the water value estimate updates immediately.</p>
           </div>
           <div class="slider-grid" id="scenarioControls"></div>
         </section>
 
+        <section class="selection-strip" id="selectionStrip" hidden></section>
         <section class="kpi-grid" id="kpiGrid"></section>
         <section class="confidence-footnotes" id="confidenceFootnotes"></section>
         <section class="manager-insights advanced-only" id="managerInsights"></section>
@@ -96,7 +97,7 @@
           <div class="two-column">
             <div class="panel wide">
               <div class="panel-head">
-                <h3>Water Impact by Segment</h3>
+                <h3>Hidden Water Value by Segment</h3>
                 <span id="sectorChartNote"></span>
               </div>
               <div id="sectorVarChart" class="chart-area"></div>
@@ -152,7 +153,7 @@
           <div class="panel">
             <div class="panel-head">
               <h3>Back-test Evidence</h3>
-              <span>Lower MAPE and higher R² are stronger</span>
+              <span>Lower prediction miss and higher fit score are stronger</span>
             </div>
             <div id="backtestScatter" class="chart-area scatter"></div>
           </div>
@@ -167,9 +168,9 @@
                   <tr>
                     <th>Brand</th>
                     <th>Points</th>
-                    <th>MAPE</th>
-                    <th>R²</th>
-                    <th>λ years used</th>
+                    <th>Prediction miss</th>
+                    <th>Fit score</th>
+                    <th>Years used</th>
                     <th>Category</th>
                   </tr>
                 </thead>
@@ -185,7 +186,7 @@
       </main>
     </div>
 
-    <script src="./dashboard-data.js?v=20260616-plain-copy"></script>
-    <script src="./app.js?v=20260616-plain-copy"></script>
+    <script src="./dashboard-data.js?v=20260619-clean-banner"></script>
+    <script src="./app.js?v=20260622-interbrand-label"></script>
   </body>
 </html>
